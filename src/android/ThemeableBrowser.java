@@ -71,7 +71,7 @@ import org.apache.cordova.PluginResult;
 import org.apache.cordova.Whitelist;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import android.app.Dialog;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -108,6 +108,8 @@ public class ThemeableBrowser extends CordovaPlugin {
     private WebView inAppWebView;
     private EditText edittext;
     private CallbackContext callbackContext;
+    //Loading
+    private Dialog mDialog;
 
     /**
      * Executes the request and returns PluginResult.
@@ -128,6 +130,8 @@ public class ThemeableBrowser extends CordovaPlugin {
             }
             final String target = t;
             final Options features = parseFeature(args.optString(2));
+
+            Log.e("targettarget",target);
 
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -176,6 +180,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                         }
                         // load in ThemeableBrowser
                         else {
+                            Log.e("ThemeableBrowserThemeableBrowser", "This is ThemeableBrowser.");
                             result = showWebPage(url, features);
                         }
                     }
@@ -185,6 +190,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                     }
                     // BLANK - or anything else
                     else {
+                        //用这种
+                        Log.e("BLANKBLANK", "This is BLANK.");
                         result = showWebPage(url, features);
                     }
 
@@ -524,6 +531,12 @@ public class ThemeableBrowser extends CordovaPlugin {
      * @return
      */
     public String showWebPage(final String url, final Options features) {
+
+         //Loading
+        // Log.e("111111111111111","1111");
+        // mDialog = LoadingDialog.createLoadingDialog(cordova.getActivity());
+        // mDialog.show();
+
         final CordovaWebView thatWebView = this.webView;
 
         // Create dialog in new thread
@@ -535,8 +548,11 @@ public class ThemeableBrowser extends CordovaPlugin {
                         android.R.style.Theme_Black_NoTitleBar,
                         features.hardwareback);
                 if (!features.disableAnimation) {
-                    dialog.getWindow().getAttributes().windowAnimations
-                            = android.R.style.Animation_Dialog;
+                    // dialog.getWindow().getAttributes().windowAnimations
+                    //         = android.R.style.Animation_Dialog;
+                    int animID = dialog.getContext().getApplicationContext().getResources().getIdentifier("dialog_animation","style",dialog.getContext().getApplicationContext().getPackageName());
+                    Log.d("HMLHMLHMLHMLHMLHML","animID"+animID);
+                    dialog.getWindow().getAttributes().windowAnimations =  animID;
                 }
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
@@ -748,6 +764,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                     }
                 }
 
+               
+
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
                 final ViewGroup.LayoutParams inAppWebViewParams = features.fullscreen
@@ -759,8 +777,13 @@ public class ThemeableBrowser extends CordovaPlugin {
                 inAppWebView.setLayoutParams(inAppWebViewParams);
                 inAppWebView.setWebChromeClient(new InAppChromeClient(thatWebView));
                 WebViewClient client = new ThemeableBrowserClient(thatWebView, new PageLoadListener() {
+
                     @Override
                     public void onPageFinished(String url, boolean canGoBack, boolean canGoForward) {
+                        Log.e("22222222222222","2222");
+                        ////设定加载结束的操作
+                        LoadingDialog.closeDialog(mDialog);
+
                         if (inAppWebView != null
                                 && title != null && features.title != null
                                 && features.title.staticText == null
@@ -776,7 +799,18 @@ public class ThemeableBrowser extends CordovaPlugin {
                             forward.setEnabled(canGoForward);
                         }
                     }
+
+                    // @Override
+                    // public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                    //     // super.onPageStarted(view, url, favicon);
+                    //     Log.e("1111111111111111","1111");
+                    //     //开始载入页面调用的
+                    //     mDialog = LoadingDialog.createLoadingDialog(cordova.getActivity());
+                    //     mDialog.show();
+                    // }
+
                 });
+
                 inAppWebView.setWebViewClient(client);
                 WebSettings settings = inAppWebView.getSettings();
                 settings.setJavaScriptEnabled(true);
@@ -1006,8 +1040,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         Resources activityRes = cordova.getActivity().getResources();
 
         if (name != null) {
-            int id = activityRes.getIdentifier(name, "drawable",
-                    cordova.getActivity().getPackageName());
+            int id = activityRes.getIdentifier(name, "drawable",cordova.getActivity().getPackageName());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 result = activityRes.getDrawable(id);
             } else {
@@ -1277,6 +1310,11 @@ public class ThemeableBrowser extends CordovaPlugin {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
+            Log.e("1111111111111111","1111");
+            //开始载入页面调用的
+            mDialog = LoadingDialog.createLoadingDialog(cordova.getActivity());
+            mDialog.show();
+            
             String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
@@ -1325,6 +1363,13 @@ public class ThemeableBrowser extends CordovaPlugin {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
 
+            // 断网或者网络连接超时
+            if(errorCode == ERROR_HOST_LOOKUP || errorCode == ERROR_CONNECT || errorCode == ERROR_TIMEOUT){
+//              view.loadUrl("about:blank"); // 避免出现默认的错误界面
+//              view.loadUrl(mErrorUrl);
+                LoadingDialog.closeDialog(mDialog);
+            }
+
             try {
                 JSONObject obj = new JSONObject();
                 obj.put("type", LOAD_ERROR_EVENT);
@@ -1336,6 +1381,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
             }
         }
+        
     }
 
     /**
@@ -1444,4 +1490,8 @@ public class ThemeableBrowser extends CordovaPlugin {
         public String staticText;
         public boolean showPageTitle;
     }
+
+
+
+
 }

@@ -49,6 +49,15 @@
         <source-file src="src/android/ThemeableBrowserDialog.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
         <source-file src="src/android/InAppChromeClient.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
         <source-file src="src/android/ThemeableBrowserUnmarshaller.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
+        <source-file src="src/android/LoadingDialog.java" target-dir="src/com/initialxy/cordova/themeablebrowser" />
+
+        <source-file src="src/android/anim/browser_in.xml" target-dir="res/anim" />
+        <source-file src="src/android/anim/browser_out.xml" target-dir="res/anim" />
+        <source-file src="src/android/anim/dialog_animation.xml" target-dir="res/values" />
+
+        <source-file src="src/android/layout/dialog_loading.xml" target-dir="res/layout" />
+        <source-file src="src/android/res/values/browser_colors.xml" target-dir="res/values" />
+        <source-file src="src/android/res/values/browser_styles.xml" target-dir="res/values" />
     </platform>
 
     <!-- ios -->
