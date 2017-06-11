@@ -56,8 +56,8 @@
         <source-file src="src/android/anim/dialog_animation.xml" target-dir="res/values" />
 
         <source-file src="src/android/layout/dialog_loading.xml" target-dir="res/layout" />
-        <source-file src="src/android/res/values/colors.xml" target-dir="res/values" />
         <source-file src="src/android/res/values/styles.xml" target-dir="res/values" />
+
     </platform>
 
     <!-- ios -->
