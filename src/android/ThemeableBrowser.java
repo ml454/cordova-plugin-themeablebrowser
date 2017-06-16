@@ -548,9 +548,9 @@ public class ThemeableBrowser extends CordovaPlugin {
                         android.R.style.Theme_Black_NoTitleBar,
                         features.hardwareback);
                 if (!features.disableAnimation) {
-                    // dialog.getWindow().getAttributes().windowAnimations
-                    //         = android.R.style.Animation_Dialog;
-                    int animID = dialog.getContext().getApplicationContext().getResources().getIdentifier("dialog_animation","style",dialog.getContext().getApplicationContext().getPackageName());
+                    dialog.getWindow().getAttributes().windowAnimations
+                            = android.R.style.Animation_Dialog;
+                    // int animID = dialog.getContext().getApplicationContext().getResources().getIdentifier("dialog_animation","style",dialog.getContext().getApplicationContext().getPackageName());
                     Log.d("HMLHMLHMLHMLHMLHML","animID"+animID);
                     dialog.getWindow().getAttributes().windowAnimations =  animID;
                 }
