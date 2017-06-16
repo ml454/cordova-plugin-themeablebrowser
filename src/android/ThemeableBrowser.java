@@ -551,8 +551,8 @@ public class ThemeableBrowser extends CordovaPlugin {
                     dialog.getWindow().getAttributes().windowAnimations
                             = android.R.style.Animation_Dialog;
                     // int animID = dialog.getContext().getApplicationContext().getResources().getIdentifier("dialog_animation","style",dialog.getContext().getApplicationContext().getPackageName());
-                    Log.d("HMLHMLHMLHMLHMLHML","animID"+animID);
-                    dialog.getWindow().getAttributes().windowAnimations =  animID;
+                    // Log.d("HMLHMLHMLHMLHMLHML","animID"+animID);
+                    // dialog.getWindow().getAttributes().windowAnimations =  animID;
                 }
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
