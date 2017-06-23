@@ -77,6 +77,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import android.webkit.JavascriptInterface;
+
 
 @SuppressLint("SetJavaScriptEnabled")
 public class ThemeableBrowser extends CordovaPlugin {
@@ -110,6 +112,25 @@ public class ThemeableBrowser extends CordovaPlugin {
     private CallbackContext callbackContext;
     //Loading
     private Dialog mDialog;
+    //JSInterface
+    private boolean isJSInterfaceEnable=false;
+    protected String session;
+    	protected String username;
+    	private class JsObject {
+    		@JavascriptInterface
+    		public String getmemberid() {
+    		 Log.i("memberid",username);
+    		return  username ; }
+
+    		@JavascriptInterface
+    		public String getmemberssion() {
+    				 Log.i("session",session);
+    		return session; }
+
+    		@JavascriptInterface
+    		public void exitwebview() { closeDialog(); }
+    	}
+
 
     /**
      * Executes the request and returns PluginResult.
@@ -200,6 +221,13 @@ public class ThemeableBrowser extends CordovaPlugin {
                     callbackContext.sendPluginResult(pluginResult);
                 }
             });
+        }
+        else if(action.equals("setJSInterface"))
+        {
+          //setJSInterface
+          this.isJSInterfaceEnable=true;
+          this.username=args.getString(0);
+          this.session=args.getString(1);
         }
         else if (action.equals("close")) {
             closeDialog();
@@ -764,7 +792,7 @@ public class ThemeableBrowser extends CordovaPlugin {
                     }
                 }
 
-               
+
 
                 // WebView
                 inAppWebView = new WebView(cordova.getActivity());
@@ -834,10 +862,15 @@ public class ThemeableBrowser extends CordovaPlugin {
                 } else if (features.clearsessioncache) {
                     CookieManager.getInstance().removeSessionCookie();
                 }
+                if(this.isJSInterfaceEnable)
+                               {
+                               		inAppWebView.addJavascriptInterface(new JsObject(), "genkiJSInterface");
+                        }
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
                 inAppWebView.getSettings().setUseWideViewPort(true);
+
                 inAppWebView.requestFocus();
                 inAppWebView.requestFocusFromTouch();
 
@@ -1314,7 +1347,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             //开始载入页面调用的
             mDialog = LoadingDialog.createLoadingDialog(cordova.getActivity());
             mDialog.show();
-            
+
             String newloc = "";
             if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
                 newloc = url;
@@ -1381,7 +1414,7 @@ public class ThemeableBrowser extends CordovaPlugin {
             } catch (JSONException ex) {
             }
         }
-        
+
     }
 
     /**

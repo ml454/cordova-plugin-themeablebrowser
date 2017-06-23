@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  *
-*/
+ */
 
 var exec = require('cordova/exec');
 var channel = require('cordova/channel');
@@ -25,28 +25,28 @@ var modulemapper = require('cordova/modulemapper');
 var urlutil = require('cordova/urlutil');
 
 function ThemeableBrowser() {
-   this.channels = {};
+    this.channels = {};
 }
 
 ThemeableBrowser.prototype = {
-    _eventHandler: function (event) {
+    _eventHandler: function(event) {
         if (event && (event.type in this.channels)) {
             this.channels[event.type].fire(event);
         }
     },
-    close: function (eventname) {
+    close: function(eventname) {
         exec(null, null, 'ThemeableBrowser', 'close', []);
         return this;
     },
-    show: function (eventname) {
+    show: function(eventname) {
         exec(null, null, 'ThemeableBrowser', 'show', []);
         return this;
     },
-    reload: function (eventname) {
+    reload: function(eventname) {
         exec(null, null, 'ThemeableBrowser', 'reload', []);
         return this;
     },
-    addEventListener: function (eventname,f) {
+    addEventListener: function(eventname, f) {
         if (!(eventname in this.channels)) {
             this.channels[eventname] = channel.create(eventname);
         }
@@ -99,7 +99,7 @@ exports.open = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
     }
 
     var cb = function(eventname) {
-       iab._eventHandler(eventname);
+        iab._eventHandler(eventname);
     };
 
     strWindowFeatures = strWindowFeatures && JSON.stringify(strWindowFeatures);
@@ -110,6 +110,12 @@ exports.open = function(strUrl, strWindowName, strWindowFeatures, callbacks) {
     }, 0);
     return iab;
 };
+
+
+exports.setJSInterface = function(username, session) {
+    exec(null, null, 'ThemeableBrowser', 'setJSInterface', [username, session]);
+};
+
 
 exports.EVT_ERR = 'ThemeableBrowserError';
 exports.EVT_WRN = 'ThemeableBrowserWarning';
