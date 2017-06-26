@@ -862,10 +862,9 @@ public class ThemeableBrowser extends CordovaPlugin {
                 } else if (features.clearsessioncache) {
                     CookieManager.getInstance().removeSessionCookie();
                 }
-                if(this.isJSInterfaceEnable)
-                               {
-                               		inAppWebView.addJavascriptInterface(new JsObject(), "genkiJSInterface");
-                        }
+                if(features.isJSInterfaceEnable){
+                    inAppWebView.addJavascriptInterface(new JsObject(), "genkiJSInterface");
+                }
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
