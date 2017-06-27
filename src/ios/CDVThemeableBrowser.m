@@ -58,7 +58,13 @@
 #define    LOCATIONBAR_HEIGHT 21.0
 #define    FOOTER_HEIGHT ((TOOLBAR_HEIGHT) + (LOCATIONBAR_HEIGHT))
 
+
+NSString *mysid = @"";
+NSString *myseesion = @"";
+
+
 #pragma mark CDVThemeableBrowser
+
 
 @interface CDVThemeableBrowser () {
     BOOL _isShown;
@@ -121,6 +127,16 @@
 
   return NO;
 }
+
+// 我寫的
+- (void)setJSInterface:(CDVInvokedUrlCommand*)command {
+    NSString *getmemberid = [command argumentAtIndex:0];
+    NSString *getmemberssion = [command argumentAtIndex:1];
+    
+    mysid = getmemberid;
+    myseesion = getmemberssion;
+}
+
 
 - (void)open:(CDVInvokedUrlCommand*)command
 {
@@ -264,7 +280,7 @@
         }
     }
     self.themeableBrowserViewController.modalPresentationStyle = presentationStyle;
-
+    
     // Set Transition Style
     UIModalTransitionStyle transitionStyle = UIModalTransitionStyleCoverVertical; // default
     if (browserOptions.transitionstyle != nil) {
@@ -275,7 +291,10 @@
         }
     }
     self.themeableBrowserViewController.modalTransitionStyle = transitionStyle;
-
+    
+    // 這個是翻書效果
+//    self.themeableBrowserViewController.modalTransitionStyle = UIModalTransitionStylePartialCurl;
+    
     // prevent webView from bouncing
     if (browserOptions.disallowoverscroll) {
         if ([self.themeableBrowserViewController.webView respondsToSelector:@selector(scrollView)]) {
@@ -550,6 +569,7 @@
 {
     _injectedIframeBridge = NO;
     _framesOpened++;
+    
 }
 
 - (void)webViewDidFinishLoad:(UIWebView*)theWebView
@@ -567,6 +587,7 @@
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
     }
+    
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
@@ -878,11 +899,17 @@
         self.titleLabel.numberOfLines = 1;
         self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
         self.titleLabel.textColor = [CDVThemeableBrowserViewController colorFromRGBA:[self getStringFromDict:_browserOptions.title withKey:kThemeableBrowserPropColor withDefault:@"#000000ff"]];
-
+        
         if (_browserOptions.title[kThemeableBrowserPropStaticText]) {
             self.titleLabel.text = _browserOptions.title[kThemeableBrowserPropStaticText];
         }
-
+        
+        // 我加 5/25 15:58
+        //self.titleLabel.textColor = [UIColor blackColor];
+        self.titleLabel.textColor = [UIColor whiteColor];
+        // 我加 5/24 19:34
+        self.titleLabel.font = [UIFont boldSystemFontOfSize:18];
+        
         [self.toolbar addSubview:self.titleLabel];
     }
 
@@ -1152,10 +1179,10 @@
     }
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
+//- (void)viewDidLoad
+//{
+//    [super viewDidLoad];
+//}
 
 - (void)viewDidUnload
 {
@@ -1313,6 +1340,7 @@
     }
 }
 
+
 - (void)viewWillAppear:(BOOL)animated
 {
     if (IsAtLeastiOSVersion(@"7.0")) {
@@ -1321,6 +1349,7 @@
     [self rePositionViews];
 
     [super viewWillAppear:animated];
+    
 }
 
 //
@@ -1409,21 +1438,105 @@
     }
 }
 
+/********  me handle  start ********/
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    UIActivityIndicatorView * mySpinner = [[UIActivityIndicatorView alloc] init];
+    self.mySpinner = mySpinner;
+    mySpinner.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+    
+    
+//    self.mySpinner.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+//    self.mySpinner.color = [UIColor lightGrayColor];
+    
+    [[UIApplication sharedApplication].keyWindow addSubview:self.mySpinner];
+    
+
+    
+//    NSLog(@"mysid:%@,myseesion:%@",mysid,myseesion);
+    
+    
+}
+// genkijsinterface
+
+- (void)exitwebview {
+//    NSLog(@"mysid:%@,myseesion:%@_exitwebview",mysid,myseesion);
+    //[self dismissViewControllerAnimated:YES completion:nil];
+    [self close];
+}
+
+- (NSString *)getmemberid {
+//    NSLog(@"mysid:%@,myseesion:%@_getmemberid",mysid,myseesion);
+    return mysid;
+}
+- (NSString *)getmemberssion {
+//    NSLog(@"mysid:%@,myseesion:%@_getmemberssion",mysid,myseesion);
+    return myseesion;
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat navigationBarHeight = self.navigationController.navigationBar.frame.size.height;
+    self.mySpinner.frame = CGRectMake((screenWidth * 0.5 - 7.5), (navigationBarHeight + 40), 20, 20);
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self stopMySpinner];
+    [self.mySpinner removeFromSuperview];
+    self.mySpinner = nil;
+}
+
+
+- (void)startMySpinner {
+    
+    self.mySpinner.hidden = false;
+    [self.mySpinner startAnimating];
+}
+
+- (void)stopMySpinner {
+    
+    self.mySpinner.hidden = true;
+    [self.mySpinner stopAnimating];
+    
+}
+/********  me handle  end ********/
 #pragma mark UIWebViewDelegate
 
 - (void)webViewDidStartLoad:(UIWebView*)theWebView
 {
+  
     // loading url, start spinner
 
     self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
 
+    
     [self.spinner startAnimating];
+    
+    
+    // 我加: 不要弹簧效果
+    theWebView.scrollView.bounces = NO;
+    
+    // 我加
+    [self startMySpinner];
+    
+    //NSLog(@"webViewDidStartLoad----->>");
+    
+    JSContext *context = [theWebView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    context[@"genkiJSInterface"] = self;
+    
 
     return [self.navigationDelegate webViewDidStartLoad:theWebView];
 }
 
 - (BOOL)webView:(UIWebView*)theWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
 {
+    
+    
     BOOL isTopLevelNavigation = [request.URL isEqual:[request mainDocumentURL]];
 
     if (isTopLevelNavigation) {
@@ -1431,7 +1544,16 @@
     }
 
     [self updateButtonDelayed:theWebView];
-
+    
+    
+    // 我加
+//    if ([self.navigationDelegate webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType]) {
+//        [self startMySpinner];
+//    }
+    
+    //NSLog(@"shouldStartLoadWithRequest------->>");
+    
+    
     return [self.navigationDelegate webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
 }
 
@@ -1449,8 +1571,11 @@
         // required to show a static text.
         self.titleLabel.text = [self.webView stringByEvaluatingJavaScriptFromString:@"document.title"];
     }
-
+    
     [self.spinner stopAnimating];
+    
+    // 我加
+    [self stopMySpinner];
 
     // Work around a bug where the first time a PDF is opened, all UIWebViews
     // reload their User-Agent from NSUserDefaults.
@@ -1467,8 +1592,18 @@
     if (isPDF) {
         [CDVUserAgentUtil setUserAgent:_prevUserAgent lockToken:_userAgentLockToken];
     }
+    
+    
+    //NSLog(@"webViewDidFinishLoad---->");
+    
+    
+    JSContext *context = [theWebView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
+    context[@"genkiJSInterface"] = self;
 
     [self.navigationDelegate webViewDidFinishLoad:theWebView];
+    
+    
+    
 }
 
 - (void)webView:(UIWebView*)theWebView didFailLoadWithError:(NSError*)error
@@ -1476,6 +1611,9 @@
     [self updateButton:theWebView];
 
     [self.spinner stopAnimating];
+    
+    // 我加
+    [self stopMySpinner];
 
     self.addressLabel.text = NSLocalizedString(@"Load Error", nil);
 
@@ -1632,3 +1770,4 @@
 
 
 @end
+

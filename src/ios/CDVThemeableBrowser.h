@@ -21,11 +21,23 @@
 #import <Cordova/CDVInvokedUrlCommand.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
 
+#import <JavaScriptCore/JavaScriptCore.h>
+
+
 #ifdef __CORDOVA_4_0_0
     #import <Cordova/CDVUIWebViewDelegate.h>
 #else
     #import <Cordova/CDVWebViewDelegate.h>
 #endif
+
+
+@protocol genkiJSInterface <JSExport>
+
+- (void)exitwebview;
+- (NSString *)getmemberid;
+- (NSString *)getmemberssion;
+
+@end
 
 @interface CDVThemeableBrowserOptions : NSObject {}
 
@@ -58,9 +70,13 @@
 @property (nonatomic) BOOL disableAnimation;
 @property (nonatomic) BOOL fullscreen;
 
+
 @end
 
+
 @class CDVThemeableBrowserViewController;
+
+
 
 @interface CDVThemeableBrowser : CDVPlugin {
     BOOL _injectedIframeBridge;
@@ -69,6 +85,12 @@
 @property (nonatomic, retain) CDVThemeableBrowserViewController* themeableBrowserViewController;
 @property (nonatomic, copy) NSString* callbackId;
 @property (nonatomic, copy) NSRegularExpression *callbackIdPattern;
+
+
+
+// 我加
+- (void)setJSInterface: (CDVInvokedUrlCommand*)command;
+
 
 - (CDVThemeableBrowserOptions*)parseOptions:(NSString*)options;
 - (void)open:(CDVInvokedUrlCommand*)command;
@@ -80,7 +102,15 @@
 
 @end
 
-@interface CDVThemeableBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate, UIActionSheetDelegate>{
+//@protocol genkiJSInterface <JSExport>
+//
+//- (void)exitwebview;
+//- (NSString *)getmemberid;
+//- (NSString *)getmemberssion;
+//
+//@end
+
+@interface CDVThemeableBrowserViewController : UIViewController <UIWebViewDelegate, CDVScreenOrientationDelegate, UIActionSheetDelegate, genkiJSInterface>{
     @private
     NSString* _userAgent;
     NSString* _prevUserAgent;
@@ -95,6 +125,8 @@
 #endif
     
 }
+
+
 
 @property (nonatomic, strong) IBOutlet UIWebView* webView;
 @property (nonatomic, strong) IBOutlet UIButton* closeButton;
@@ -114,6 +146,10 @@
 @property (nonatomic) NSURL* currentURL;
 @property (nonatomic) CGFloat titleOffset;
 
+/** my spinner */
+@property(nonatomic,strong) UIActivityIndicatorView * mySpinner;
+
+
 - (void)close;
 - (void)reload;
 - (void)navigateTo:(NSURL*)url;
@@ -132,4 +168,5 @@
 @property (nonatomic, weak) id <CDVScreenOrientationDelegate> orientationDelegate;
 
 @end
+
 
