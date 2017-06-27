@@ -115,20 +115,21 @@ public class ThemeableBrowser extends CordovaPlugin {
     //JSInterface
     private boolean isJSInterfaceEnable=false;
     protected String session;
-    	protected String username;
-    	private class JsObject {
-    		@JavascriptInterface
-    		public String getmemberid() {
-    		 Log.i("memberid",username);
-    		return  username ; }
+    protected String username;
+    private class JsObject {
+    	@JavascriptInterface
+    	public String getmemberid() {
+    	Log.i("memberid",username);
+    	return  username ; }
 
-    		@JavascriptInterface
-    		public String getmemberssion() {
-    				 Log.i("session",session);
-    		return session; }
+    	@JavascriptInterface
+    	public String getmemberssion() {
+    		Log.i("session",session);
+    		return session; 
+        }
 
-    		@JavascriptInterface
-    		public void exitwebview() { closeDialog(); }
+    	@JavascriptInterface
+    	public void exitwebview() { closeDialog(); }
     	}
 
 
@@ -225,7 +226,7 @@ public class ThemeableBrowser extends CordovaPlugin {
         else if(action.equals("setJSInterface"))
         {
           //setJSInterface
-          this.isJSInterfaceEnable=true;
+        //   this.isJSInterfaceEnable=true;
           this.username=args.getString(0);
           this.session=args.getString(1);
         }
@@ -862,9 +863,9 @@ public class ThemeableBrowser extends CordovaPlugin {
                 } else if (features.clearsessioncache) {
                     CookieManager.getInstance().removeSessionCookie();
                 }
-                if(features.isJSInterfaceEnable){
+                // if(features.isJSInterfaceEnable){
                     inAppWebView.addJavascriptInterface(new JsObject(), "genkiJSInterface");
-                }
+                // }
 
                 inAppWebView.loadUrl(url);
                 inAppWebView.getSettings().setLoadWithOverviewMode(true);
